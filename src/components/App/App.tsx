@@ -4,7 +4,7 @@ import { fetchMovies } from "../../services/movieService";
 import type { Movie } from "../../types/movie";
 import toast, { Toaster } from 'react-hot-toast';
 import MovieGrid from "../MovieGrid/MovieGrid";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Loader from "../Loader/Loader";
 import ErrorMessage from "../ErrorMessage/ErrorMessage";
 import MovieModal from "../MovieModal/MovieModal";
@@ -36,6 +36,13 @@ const totalPages = data?.total_pages ?? 0;
     setPage(1);
   };
 
+  useEffect(() => {
+    if (!isLoading && !isError && movies.length === 0 && searchQuery) {
+      toast.error("No movies found for your request.");
+    }
+  }, [isLoading, isError, movies.length, searchQuery]);
+       
+  
   const handleSelect = (movie: Movie) => {
     setSelectedMovie(movie);
   };
@@ -64,9 +71,6 @@ const totalPages = data?.total_pages ?? 0;
 )}
 {isLoading && <Loader />}
       {isError && <ErrorMessage />}
-{!isLoading && !isError && movies.length === 0 && searchQuery && (
-        toast.error("No movies found for your request.")
-      )}
       <MovieGrid movies={movies} onSelect={handleSelect} />
       <Toaster position="top-center" reverseOrder={false} />
       {selectedMovie && <MovieModal movie={selectedMovie} onClose={closeModal} />}
